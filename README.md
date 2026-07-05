@@ -24,3 +24,9 @@ This phase focuses on the code and structure needed to start the project cleanly
 - A basic health endpoint for readiness checks.
 
 No rate-limiting business logic is added yet. That belongs to later phases so the architecture stays easy to change and test.
+
+## Current Progress
+
+- ✅ Project initialized
+- ✅ Express backend setup
+- ✅ Health check endpoint implemented
