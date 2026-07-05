@@ -30,3 +30,9 @@ No rate-limiting business logic is added yet. That belongs to later phases so th
 - ✅ Project initialized
 - ✅ Express backend setup
 - ✅ Health check endpoint implemented
+
+## Features Implemented
+
+- Express Server
+- Health Endpoint
+- Global Logger Middleware
