@@ -1,11 +1,13 @@
-function getHealthStatus(request, response) {
-  response.status(200).json({
-    status: 'ok',
-    service: 'RateShield backend',
-    timestamp: new Date().toISOString()
-  });
-}
+const getHealth = (req, res) => {
+
+    return res.status(200).json({
+        success: true,
+        message: "RateShield Backend is running",
+        timestamp: new Date().toISOString()
+    });
+
+};
 
 module.exports = {
-  getHealthStatus
+    getHealth
 };

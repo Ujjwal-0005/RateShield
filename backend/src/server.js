@@ -1,18 +1,7 @@
-const createApp = require('./app');
-const environment = require('./config/env');
+const app = require("./app");
 
-function startServer() {
-  const app = createApp();
+const PORT = process.env.PORT || 5000;
 
-  app.listen(environment.port, () => {
-    console.log(`RateShield backend listening on port ${environment.port}`);
-  });
-}
-
-if (require.main === module) {
-  startServer();
-}
-
-module.exports = {
-  startServer
-};
+app.listen(PORT, () => {
+    console.log(`🚀 RateShield server running on port ${PORT}`);
+});
