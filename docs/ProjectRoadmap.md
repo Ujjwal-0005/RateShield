@@ -31,3 +31,27 @@ Docker
 ## Phase 8
 
 Deployment
+
+##This is the first architecture diagram that's directly related to the rate limiter.
+
+Browser
+
+↓
+
+Logger
+
+↓
+
+Rate Limiter
+
+↓
+
+Health Route
+
+↓
+
+Controller
+
+↓
+
+Response
