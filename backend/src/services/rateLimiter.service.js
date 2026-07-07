@@ -1,40 +1,63 @@
-const requests = new Map();
+// const requests = new Map();
 
-const WINDOW_SIZE = 60 * 1000; // 60 seconds
+// const WINDOW_SIZE = 60 * 1000; // 60 seconds
+// const MAX_REQUESTS = 5;
+
+// function isAllowed(ip) {
+//     const now = Date.now();
+
+//     const user = requests.get(ip);
+
+//     if (!user) {
+//         requests.set(ip, {
+//             count: 1,
+//             startTime: now,
+//         });
+
+//         return true;
+//     }
+
+//     const timePassed = now - user.startTime;
+
+//     if (timePassed > WINDOW_SIZE) {
+//         requests.set(ip, {
+//             count: 1,
+//             startTime: now,
+//         });
+
+//         return true;
+//     }
+
+//     if (user.count >= MAX_REQUESTS) {
+//         return false;
+//     }
+
+//     user.count++;
+
+//     return true;
+// }
+
+// module.exports = {
+//     isAllowed,
+// };
+
+
+const redisClient = require("../redis/redisClient");
+
+const WINDOW_SIZE = 60;
 const MAX_REQUESTS = 5;
 
-function isAllowed(ip) {
-    const now = Date.now();
+async function isAllowed(ip) {
 
-    const user = requests.get(ip);
+    const key = `rate_limit:${ip}`;
 
-    if (!user) {
-        requests.set(ip, {
-            count: 1,
-            startTime: now,
-        });
+    const requests = await redisClient.incr(key);
 
-        return true;
+    if (requests === 1) {
+        await redisClient.expire(key, WINDOW_SIZE);
     }
 
-    const timePassed = now - user.startTime;
-
-    if (timePassed > WINDOW_SIZE) {
-        requests.set(ip, {
-            count: 1,
-            startTime: now,
-        });
-
-        return true;
-    }
-
-    if (user.count >= MAX_REQUESTS) {
-        return false;
-    }
-
-    user.count++;
-
-    return true;
+    return requests <= MAX_REQUESTS;
 }
 
 module.exports = {

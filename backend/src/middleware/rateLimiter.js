@@ -1,9 +1,9 @@
-const { isAllowed } = require("../services/rateLimiter.service");
+const { isAllowed } =  require("../services/rateLimiter.service");
 
-function rateLimiter(req, res, next) {
+async function  rateLimiter(req, res, next) {
     const ip = req.ip;
 
-    const allowed = isAllowed(ip);
+    const allowed =await isAllowed(ip);
 
     if (!allowed) {
         return res.status(429).json({

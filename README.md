@@ -36,3 +36,10 @@ No rate-limiting business logic is added yet. That belongs to later phases so th
 - Express Server
 - Health Endpoint
 - Global Logger Middleware
+
+## Features
+
+- ✅ Global Logger Middleware
+- ✅ Fixed Window Rate Limiter (In-Memory)
+
+✅Distributed Fixed Window using Redis
