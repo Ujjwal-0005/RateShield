@@ -41,25 +41,69 @@
 //     isAllowed,
 // };
 
+//fixed window
+// const redisClient = require("../redis/redisClient");
 
+// const WINDOW_SIZE = 60;
+// const MAX_REQUESTS = 5;
+
+// async function isAllowed(ip) {
+
+//     const key = `rate_limit:${ip}`;
+
+//     const requests = await redisClient.incr(key);
+
+//     if (requests === 1) {
+//         await redisClient.expire(key, WINDOW_SIZE);
+//     }
+
+//     return requests <= MAX_REQUESTS;
+// }
+
+// module.exports = {
+//     isAllowed,
+// };
+
+
+
+
+//slidding window algo replacing the previous fixed window algo 
 const redisClient = require("../redis/redisClient");
 
-const WINDOW_SIZE = 60;
+const WINDOW_SIZE = 60; // seconds
 const MAX_REQUESTS = 5;
 
 async function isAllowed(ip) {
 
     const key = `rate_limit:${ip}`;
 
-    const requests = await redisClient.incr(key);
+    const now = Date.now();
 
-    if (requests === 1) {
-        await redisClient.expire(key, WINDOW_SIZE);
+    const windowStart = now - WINDOW_SIZE * 1000;
+
+    // Remove requests older than 60 seconds
+    await redisClient.zRemRangeByScore(key, 0, windowStart);
+
+    // Count remaining requests
+    const requestCount = await redisClient.zCard(key);
+
+    if (requestCount >= MAX_REQUESTS) {
+        return false;
     }
 
-    return requests <= MAX_REQUESTS;
+    // Store current request
+    await redisClient.zAdd(key, {
+        score: now,
+        value: now.toString()
+    });
+
+    // Auto cleanup
+    await redisClient.expire(key, WINDOW_SIZE);
+
+    return true;
+
 }
 
 module.exports = {
-    isAllowed,
+    isAllowed
 };
