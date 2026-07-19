@@ -1,5 +1,7 @@
 # Node modules
 node_modules/
+docs/
+
 
 # Environment variables
 .env
@@ -21,4 +23,4 @@ Thumbs.db
 .idea/
 
 # Coverage
-coverage/
+coverage/docs/

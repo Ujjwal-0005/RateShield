@@ -39,4 +39,5 @@ module.exports = {
     REDIS_PORT: process.env.REDIS_PORT,
     REDIS_PASSWORD: process.env.REDIS_PASSWORD,
     MONGODB_URI: process.env.MONGODB_URI,
+    JWT_SECRET: process.env.JWT_SECRET || "rateshield_secret_key_12345",
 };
