@@ -1,43 +1,45 @@
-// const dotenv = require('dotenv');
-
-// dotenv.config();
-
-// function requiredEnv(name) {
-//   const value = process.env[name];
-
-//   if (value === undefined || value === '') {
-//     throw new Error(`Missing required environment variable: ${name}`);
-//   }
-
-//   return value;
-// }
-
-// function loadEnvironment() {
-//   const portValue = requiredEnv('PORT');
-//   const port = Number(portValue);
-
-//   if (!Number.isInteger(port) || port <= 0) {
-//     throw new Error('PORT must be a positive integer');
-//   }
-
-//   return {
-//     nodeEnv: requiredEnv('NODE_ENV'),
-//     port,
-//     apiPrefix: requiredEnv('API_PREFIX')
-//   };
-// }
-
-// module.exports = loadEnvironment();
-
-
 require("dotenv").config();
 
-module.exports = {
-    PORT: process.env.PORT,
-    NODE_ENV: process.env.NODE_ENV,
-    REDIS_HOST: process.env.REDIS_HOST,
-    REDIS_PORT: process.env.REDIS_PORT,
-    REDIS_PASSWORD: process.env.REDIS_PASSWORD,
-    MONGODB_URI: process.env.MONGODB_URI,
-    JWT_SECRET: process.env.JWT_SECRET || "rateshield_secret_key_12345",
+function parseIntegerEnv(name, defaultValue) {
+    const rawValue = process.env[name];
+
+    if (rawValue === undefined || rawValue === "") {
+        return defaultValue;
+    }
+
+    const parsedValue = Number(rawValue);
+    if (!Number.isInteger(parsedValue) || parsedValue <= 0) {
+        throw new Error(`${name} must be a positive integer`);
+    }
+
+    return parsedValue;
+}
+
+function requiredEnv(name) {
+    const value = process.env[name];
+
+    if (value === undefined || value === "") {
+        throw new Error(`Missing required environment variable: ${name}`);
+    }
+
+    return value;
+}
+
+const nodeEnv = process.env.NODE_ENV || "development";
+const isProduction = nodeEnv === "production";
+
+const config = {
+    NODE_ENV: nodeEnv,
+    PORT: parseIntegerEnv("PORT", 5000),
+    REDIS_HOST: process.env.REDIS_HOST || "localhost",
+    REDIS_PORT: parseIntegerEnv("REDIS_PORT", 6379),
+    REDIS_PASSWORD: process.env.REDIS_PASSWORD || "",
+    MONGODB_URI: requiredEnv("MONGODB_URI"),
+    JWT_SECRET: process.env.JWT_SECRET || (isProduction ? "" : "rateshield_secret_key_12345"),
 };
+
+if (!config.JWT_SECRET) {
+    throw new Error("Missing required environment variable: JWT_SECRET");
+}
+
+module.exports = Object.freeze(config);
