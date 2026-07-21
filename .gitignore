@@ -1,10 +1,13 @@
 # Node modules
 node_modules/
-docs/
 
+# Documentation
+docs/
 
 # Environment variables
 .env
+backend/.env
+**/.env
 
 # Logs
 logs
@@ -23,4 +26,4 @@ Thumbs.db
 .idea/
 
 # Coverage
-coverage/docs/
+coverage/
