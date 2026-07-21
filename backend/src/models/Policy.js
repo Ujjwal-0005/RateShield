@@ -5,15 +5,15 @@ const policySchema = new mongoose.Schema(
         name: {
             type: String,
             required: [true, "Policy name is required"],
-            unique: true,
             trim: true,
         },
         description: {
             type: String,
+            trim: true,
         },
         algorithm: {
             type: String,
-            enum: ["fixed", "sliding", "token_bucket"],
+            enum: ["sliding", "fixed", "token_bucket"],
             default: "sliding",
         },
         windowSize: {
@@ -26,22 +26,18 @@ const policySchema = new mongoose.Schema(
             required: [true, "Max requests is required"],
             min: [1, "Max requests must be at least 1"],
         },
-        tokenBucketRate: {
-            type: Number, // Tokens per second refilled (optional, otherwise defaults to maxRequests / windowSize)
-        },
         isActive: {
             type: Boolean,
             default: true,
-        },
-        createdBy: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "User",
-            required: [true, "Policy must belong to a user"],
         },
     },
     {
         timestamps: true,
     }
 );
+
+policySchema.index({ name: 1 }, { unique: true });
+policySchema.index({ isActive: 1, algorithm: 1, createdAt: -1 });
+policySchema.index({ name: "text", description: "text" });
 
 module.exports = mongoose.model("Policy", policySchema);
