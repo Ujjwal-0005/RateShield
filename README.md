@@ -1,71 +1,110 @@
 # RateShield
 
-RateShield is a production-grade distributed rate limiter built with JavaScript, Node.js, Express.js, Redis, MongoDB Atlas, React, and Docker.
+RateShield is a Node.js rate-limiting backend with MongoDB, Redis, JWT-based dashboard authentication, policy management, API key management, and Redis-backed request limiting.
 
----
+## Current Repository Layout
 
-## 🚀 Current Status: Core Backend Complete
+- `backend/` contains the Express API, services, models, validators, and Redis integration.
+- `frontend/` is still the default Vite React starter and is not yet connected to the backend UI.
+- `docs/` contains architecture, testing, debugging, and roadmap documentation.
+- `docker-compose.yml` currently starts Redis only.
 
-All database-backed modules, validation schemas, key generation algorithms, and multi-algorithm Redis rate limiters are fully implemented, verified, and ready for deployment.
+## Backend Features
 
-### Current Progress
-- [x] Express backend architecture initialized
-- [x] Global Request Logger & Security Middlewares (Helmet, CORS)
-- [x] Health Check and Live Telemetry Endpoint
-- [x] MongoDB database connection with Mongoose
-- [x] **User Authentication & Dashboard Access** (JWT, Password hashing)
-- [x] **Rate Limit Policy Management** (CRUD endpoints)
-- [x] **Secure API Key Management** (SHA-256 hash storage, masking, automatic cache invalidation)
-- [x] **Core Distributed Rate Limiter** (Fixed Window, Sliding Window Log, and Token Bucket via atomic Redis Lua scripting)
+- JWT auth for dashboard routes.
+- Policy management endpoints with create, list, search, update, activate, deactivate, and delete.
+- API key creation, listing, and revocation.
+- API key hashing and masking.
+- Redis cache resolution for API keys.
+- Fixed window, sliding window, and token bucket rate-limiting logic.
+- Health and metrics endpoints.
 
----
+## Policy Management Module
 
-## 📁 Repository Structure
+The policy module is the source of truth for all rate-limiter decisions. Every API key references exactly one policy, and the limiter reads the policy values instead of using hardcoded limits.
 
-```text
-├── backend/
-│   ├── src/
-│   │   ├── config/          # Environment & database connections
-│   │   ├── controllers/     # MVC controller routers
-│   │   ├── middleware/      # Auth (JWT) & Rate Limiting middlewares
-│   │   ├── models/          # Mongoose database schemas (User, Policy, ApiKey)
-│   │   ├── redis/           # Redis connection configuration
-│   │   ├── routes/          # API route definitions
-│   │   ├── services/        # Database operations & rate limiting engines
-│   │   ├── utils/           # Cryptographic key generators
-│   │   └── validators/      # Payload schema validators
+### Available Endpoints
+
+- `GET /policies`
+- `POST /policies`
+- `GET /policies/:id`
+- `PUT /policies/:id`
+- `PATCH /policies/:id/activate`
+- `PATCH /policies/:id/deactivate`
+- `DELETE /policies/:id`
+
+### Seeder
+
+Run the baseline policy seeder with:
+
+```bash
+cd backend
+npm run seed:policies
 ```
 
----
+It safely upserts the Free, Premium, and Enterprise policies.
 
-## 📖 Documentation
+### Future Integration
 
-Complete, production-grade documentation has been prepared to guide you through testing, deployment, and interview scenarios:
+- Admin dashboard policy management UI
+- API key assignment by tier
+- Usage analytics by policy
+- Policy-aware alerting and billing tiers
 
-- **Architecture & Cache Strategy**: [docs/APIKey_and_Policy_Architecture.md](file:///d:/RateShield/docs/APIKey_and_Policy_Architecture.md)
-- **API Documentation**: [docs/API_Documentation.md](file:///d:/RateShield/docs/API_Documentation.md)
-- **End-to-End Testing Guide**: [docs/Testing_Guide.md](file:///d:/RateShield/docs/Testing_Guide.md)
-- **Debugging & Common Bugs Guide**: [docs/Common_Bugs_and_Debugging.md](file:///d:/RateShield/docs/Common_Bugs_and_Debugging.md)
-- **Production & Scalability Analysis**: [docs/Production_and_Scalability.md](file:///d:/RateShield/docs/Production_and_Scalability.md)
-- **Interview Preparation Guide**: [docs/Interview_Preparation.md](file:///d:/RateShield/docs/Interview_Preparation.md)
+## Quick Start
 
----
+### Backend
 
-## 🛠️ Quick Start
+1. Install dependencies:
 
-1. **Configure Environment Variables**:
-   Create a `.env` in `backend/` using the `.env.example` template:
-   ```env
-   PORT=5000
-   MONGODB_URI=mongodb+srv://...
-   REDIS_HOST=localhost
-   REDIS_PORT=6379
-   JWT_SECRET=your_jwt_secret_here
-   ```
-
-2. **Run Services Locally**:
    ```bash
    cd backend
    npm install
+   ```
+
+2. Create a `backend/.env` file with at least:
+
+   ```env
+   PORT=5000
+   NODE_ENV=development
+   MONGODB_URI=mongodb://localhost:27017/rateshield
+   REDIS_HOST=localhost
+   REDIS_PORT=6379
+   JWT_SECRET=change-me
+   ```
+
+3. Start the backend:
+   ```bash
    npm run dev
    ```
+
+### Redis
+
+Start Redis with Docker Compose:
+
+```bash
+docker compose up -d redis
+```
+
+## Documentation
+
+- [Project Architecture](docs/ProjectArchitecture.md)
+- [Current Project Status](docs/CurrentProjectStatus.md)
+- [Repository Structure](docs/RepositoryStructure.md)
+- [Development Roadmap](docs/DevelopmentRoadmap.md)
+- [API Documentation](docs/API_Documentation.md)
+- [Testing Guide](docs/Testing_Guide.md)
+- [Policy Management](docs/PolicyManagement.md)
+- [Policy Management API](docs/PolicyManagement_API.md)
+- [Policy Management Architecture](docs/PolicyManagement_Architecture.md)
+- [Policy Management Flow](docs/PolicyManagement_Flow.md)
+- [Policy Management Testing](docs/PolicyManagement_Testing.md)
+- [Policy Management Interview Notes](docs/PolicyManagement_Interview.md)
+- [Common Bugs and Debugging](docs/Common_Bugs_and_Debugging.md)
+
+## Notes
+
+- The backend uses CommonJS modules.
+- The backend config now validates required environment variables at startup.
+- Expired API keys are rechecked when served from Redis cache.
+- The project does not currently include a root-level package manifest or a `docker/` directory.
