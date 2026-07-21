@@ -79,7 +79,7 @@ async function checkRateLimit(keyId, policy) {
         
         // Calculate refill rate as tokens per millisecond
         // If policy has custom tokenBucketRate, use it, otherwise default to maxRequests / windowSize
-        const ratePerSec = policy.tokenBucketRate || (maxRequests / windowSize);
+        const ratePerSec = maxRequests / windowSize;
         const refillRatePerMs = ratePerSec / 1000;
         
         const ttl = windowSize * 2; // Keep state longer than window size

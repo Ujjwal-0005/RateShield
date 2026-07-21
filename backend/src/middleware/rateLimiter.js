@@ -42,6 +42,15 @@ async function rateLimiter(req, res, next) {
             });
         }
 
+        if (resolvedKey.policyInactive || resolvedKey.policy?.isActive === false) {
+            await metrics.incrementRequests();
+            await metrics.incrementBlocked();
+            return res.status(403).json({
+                success: false,
+                message: "Access denied: the policy assigned to this API Key is inactive.",
+            });
+        }
+
         // Check rate limiting status in Redis
         const rateLimitResult = await rateLimiterService.checkRateLimit(
             resolvedKey.keyId.toString(),

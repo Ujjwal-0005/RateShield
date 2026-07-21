@@ -3,6 +3,15 @@ const Policy = require("../models/Policy");
 const { generateRawKey, hashKey, maskKey } = require("../utils/keyGenerator");
 const redisClient = require("../redis/redisClient");
 
+function isExpired(expiresAt) {
+    return Boolean(expiresAt) && new Date(expiresAt) < new Date();
+}
+
+async function removeCachedKey(hashedKey) {
+    const cacheKey = `apikey:val:${hashedKey}`;
+    await redisClient.del(cacheKey);
+}
+
 /**
  * Creates and registers a new API key.
  */
@@ -42,7 +51,7 @@ async function createApiKey({ name, policyId, userId, expiresAt }) {
             algorithm: policy.algorithm,
             windowSize: policy.windowSize,
             maxRequests: policy.maxRequests,
-            tokenBucketRate: policy.tokenBucketRate,
+            isActive: policy.isActive,
         },
     };
 
@@ -108,22 +117,48 @@ async function resolveApiKey(rawKey) {
     // Try cache first
     const cached = await redisClient.get(cacheKey);
     if (cached) {
-        return JSON.parse(cached);
+        const cachedValue = JSON.parse(cached);
+
+        if (isExpired(cachedValue.expiresAt)) {
+            await removeCachedKey(hashed);
+            return null;
+        }
+
+        return cachedValue;
     }
 
     // Database fallback
     const keyDoc = await ApiKey.findOne({ key: hashed, isActive: true })
-        .populate("policy");
+        .populate("policy", "name description algorithm windowSize maxRequests isActive");
 
     if (!keyDoc) {
         return null;
     }
 
+    if (!keyDoc.policy || keyDoc.policy.isActive === false) {
+        return {
+            policyInactive: true,
+            keyId: keyDoc._id,
+            userId: keyDoc.user,
+            isActive: keyDoc.isActive,
+            expiresAt: keyDoc.expiresAt,
+            policy: keyDoc.policy
+                ? {
+                    id: keyDoc.policy._id,
+                    algorithm: keyDoc.policy.algorithm,
+                    windowSize: keyDoc.policy.windowSize,
+                    maxRequests: keyDoc.policy.maxRequests,
+                    isActive: keyDoc.policy.isActive,
+                }
+                : null,
+        };
+    }
+
     // Check expiration
-    if (keyDoc.expiresAt && new Date(keyDoc.expiresAt) < new Date()) {
-        // Handle expired key
+    if (isExpired(keyDoc.expiresAt)) {
         keyDoc.isActive = false;
         await keyDoc.save();
+        await removeCachedKey(hashed);
         return null;
     }
 
@@ -137,7 +172,7 @@ async function resolveApiKey(rawKey) {
             algorithm: keyDoc.policy.algorithm,
             windowSize: keyDoc.policy.windowSize,
             maxRequests: keyDoc.policy.maxRequests,
-            tokenBucketRate: keyDoc.policy.tokenBucketRate,
+            isActive: keyDoc.policy.isActive,
         },
     };
 
