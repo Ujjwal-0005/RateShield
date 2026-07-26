@@ -36,6 +36,9 @@ const config = {
     REDIS_PASSWORD: process.env.REDIS_PASSWORD || "",
     MONGODB_URI: requiredEnv("MONGODB_URI"),
     JWT_SECRET: process.env.JWT_SECRET || (isProduction ? "" : "rateshield_secret_key_12345"),
+    JWT_EXPIRES_IN: process.env.JWT_EXPIRES_IN || "24h",
+    JWT_REFRESH_SECRET: process.env.JWT_REFRESH_SECRET || (isProduction ? "" : "rateshield_refresh_secret_key_67890"),
+    JWT_REFRESH_EXPIRES_IN: process.env.JWT_REFRESH_EXPIRES_IN || "7d",
 };
 
 if (!config.JWT_SECRET) {
