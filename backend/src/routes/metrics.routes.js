@@ -1,11 +1,9 @@
 const express = require("express");
-
 const router = express.Router();
+const { getMetrics } = require("../controllers/metrics.controller");
+const { authenticateToken } = require("../middleware/auth");
 
-const {
-    getMetrics
-} = require("../controllers/metrics.controller");
-
-router.get("/", getMetrics);
+// Require authentication for system metrics
+router.get("/", authenticateToken, getMetrics);
 
 module.exports = router;

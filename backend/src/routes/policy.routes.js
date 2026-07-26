@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const policyController = require("../controllers/policy.controller");
-const { authenticateToken } = require("../middleware/auth");
+const { authenticateToken, authorizeRoles } = require("../middleware/auth");
 const {
 	validatePolicyCreate,
 	validatePolicyUpdate,
@@ -9,8 +9,9 @@ const {
 	validatePolicyQuery,
 } = require("../validators/policy.validator");
 
-// Apply authentication to all policy routes
+// Require authentication and admin role for all policy management endpoints
 router.use(authenticateToken);
+router.use(authorizeRoles("admin", "superadmin"));
 
 router.get("/", validatePolicyQuery, policyController.getPolicies);
 router.post("/", validatePolicyCreate, policyController.createPolicy);
