@@ -5,14 +5,9 @@ const apiKeyService = require("../services/apiKey.service");
  */
 async function createApiKey(req, res, next) {
     try {
-        const { name, policyId, expiresAt } = req.body;
-        const userId = req.user.id;
-
         const result = await apiKeyService.createApiKey({
-            name,
-            policyId,
-            userId,
-            expiresAt,
+            ...req.validatedApiKeyBody,
+            createdBy: req.user.id,
         });
 
         res.status(201).json({
@@ -30,14 +25,97 @@ async function createApiKey(req, res, next) {
  */
 async function getApiKeys(req, res, next) {
     try {
-        const userId = req.user.id;
         const isAdmin = req.user.role === "admin";
-        
-        const keys = await apiKeyService.getApiKeys(userId, isAdmin);
+
+        const result = await apiKeyService.getApiKeys({
+            userId: req.user.id,
+            isAdmin,
+            filters: req.validatedApiKeyQuery || {},
+        });
 
         res.status(200).json({
             success: true,
-            data: keys,
+            data: result.items,
+            meta: result.meta,
+        });
+    } catch (error) {
+        next(error);
+    }
+}
+
+async function getApiKeyById(req, res, next) {
+    try {
+        const isAdmin = req.user.role === "admin";
+        const key = await apiKeyService.getApiKeyById(req.params.id, req.user.id, isAdmin);
+
+        res.status(200).json({
+            success: true,
+            data: key,
+        });
+    } catch (error) {
+        next(error);
+    }
+}
+
+async function updateApiKey(req, res, next) {
+    try {
+        const isAdmin = req.user.role === "admin";
+        const key = await apiKeyService.updateApiKey(req.params.id, req.user.id, req.validatedApiKeyBody, isAdmin);
+
+        res.status(200).json({
+            success: true,
+            message: "API Key updated successfully",
+            data: key,
+        });
+    } catch (error) {
+        next(error);
+    }
+}
+
+async function regenerateApiKey(req, res, next) {
+    try {
+        const isAdmin = req.user.role === "admin";
+        const key = await apiKeyService.regenerateApiKey(
+            req.params.id,
+            req.user.id,
+            isAdmin,
+            req.validatedApiKeyBody?.keyType
+        );
+
+        res.status(200).json({
+            success: true,
+            message: "API Key regenerated successfully. Store the new rawKey immediately.",
+            data: key,
+        });
+    } catch (error) {
+        next(error);
+    }
+}
+
+async function disableApiKey(req, res, next) {
+    try {
+        const isAdmin = req.user.role === "admin";
+        const key = await apiKeyService.disableApiKey(req.params.id, req.user.id, isAdmin);
+
+        res.status(200).json({
+            success: true,
+            message: "API Key disabled successfully",
+            data: key,
+        });
+    } catch (error) {
+        next(error);
+    }
+}
+
+async function enableApiKey(req, res, next) {
+    try {
+        const isAdmin = req.user.role === "admin";
+        const key = await apiKeyService.enableApiKey(req.params.id, req.user.id, isAdmin);
+
+        res.status(200).json({
+            success: true,
+            message: "API Key enabled successfully",
+            data: key,
         });
     } catch (error) {
         next(error);
@@ -50,14 +128,13 @@ async function getApiKeys(req, res, next) {
 async function revokeApiKey(req, res, next) {
     try {
         const { id } = req.params;
-        const userId = req.user.id;
         const isAdmin = req.user.role === "admin";
 
-        const key = await apiKeyService.revokeApiKey(id, userId, isAdmin);
+        const key = await apiKeyService.deleteApiKey(id, req.user.id, isAdmin);
 
         res.status(200).json({
             success: true,
-            message: "API Key revoked successfully",
+            message: "API Key deleted successfully",
             data: key,
         });
     } catch (error) {
@@ -68,5 +145,10 @@ async function revokeApiKey(req, res, next) {
 module.exports = {
     createApiKey,
     getApiKeys,
+    getApiKeyById,
+    updateApiKey,
+    regenerateApiKey,
+    disableApiKey,
+    enableApiKey,
     revokeApiKey,
 };
