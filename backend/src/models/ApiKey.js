@@ -4,34 +4,75 @@ const apiKeySchema = new mongoose.Schema(
     {
         name: {
             type: String,
-            required: [true, "Key name is required"],
+            required: [true, "API key name is required"],
             trim: true,
         },
         key: {
             type: String,
             required: true,
-            unique: true, // Stores SHA-256 hash of the API key
+            unique: true,
+            trim: true,
+        },
+        hashedKey: {
+            type: String,
+            required: true,
+            unique: true,
+            select: false,
         },
         maskedKey: {
             type: String,
-            required: true, // Safe version to show in UI, e.g. "rs_live_****1234"
+            required: true,
+            trim: true,
         },
-        user: {
+        description: {
+            type: String,
+            trim: true,
+            default: "",
+        },
+        status: {
+            type: String,
+            enum: ["active", "disabled", "revoked", "deleted", "expired"],
+            default: "active",
+            index: true,
+        },
+        createdBy: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "User",
-            required: [true, "Key must belong to a user"],
+            required: [true, "API key must belong to a user"],
+            index: true,
         },
         policy: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "Policy",
-            required: [true, "Key must be linked to a policy"],
+            required: [true, "API key must be linked to a policy"],
+            index: true,
         },
-        isActive: {
-            type: Boolean,
-            default: true,
+        keyType: {
+            type: String,
+            enum: ["live", "test"],
+            default: "live",
+            index: true,
+        },
+        lastUsed: {
+            type: Date,
+            default: null,
+        },
+        usageCount: {
+            type: Number,
+            default: 0,
+            min: 0,
         },
         expiresAt: {
             type: Date,
+            default: null,
+        },
+        metadata: {
+            type: mongoose.Schema.Types.Mixed,
+            default: {},
+        },
+        deletedAt: {
+            type: Date,
+            default: null,
         },
     },
     {
@@ -39,7 +80,10 @@ const apiKeySchema = new mongoose.Schema(
     }
 );
 
-// Indexing key hash for extremely fast database lookups if cache misses
-apiKeySchema.index({ key: 1 });
+apiKeySchema.index({ key: 1 }, { unique: true });
+apiKeySchema.index({ hashedKey: 1 }, { unique: true });
+apiKeySchema.index({ createdBy: 1, status: 1, createdAt: -1 });
+apiKeySchema.index({ policy: 1, status: 1, createdAt: -1 });
+apiKeySchema.index({ name: "text", description: "text", key: "text" });
 
 module.exports = mongoose.model("ApiKey", apiKeySchema);
