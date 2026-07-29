@@ -1,0 +1,77 @@
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
+  font-family: var(--font-sans);
+  font-weight: var(--font-medium);
+  cursor: pointer;
+  transition: background var(--transition-fast), border-color var(--transition-fast),
+              color var(--transition-fast), box-shadow var(--transition-fast),
+              transform var(--transition-fast);
+  white-space: nowrap;
+  user-select: none;
+  position: relative;
+}
+.btn:active:not(:disabled) { transform: translateY(1px); }
+.btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* Sizes */
+.btn--sm  { height: 28px; padding: 0 10px; font-size: var(--text-xs); gap: 4px; }
+.btn--md  { height: 34px; padding: 0 14px; font-size: var(--text-sm); }
+.btn--lg  { height: 40px; padding: 0 20px; font-size: var(--text-base); }
+
+/* Variants */
+.btn--primary {
+  background: var(--color-brand);
+  color: #fff;
+  border-color: var(--color-brand);
+}
+.btn--primary:hover:not(:disabled) {
+  background: var(--color-brand-hover);
+  box-shadow: var(--shadow-glow);
+}
+
+.btn--secondary {
+  background: var(--color-bg-elevated);
+  color: var(--color-text-primary);
+  border-color: var(--color-border-subtle);
+}
+.btn--secondary:hover:not(:disabled) {
+  background: var(--color-bg-overlay);
+  border-color: var(--color-text-muted);
+}
+
+.btn--ghost {
+  background: transparent;
+  color: var(--color-text-secondary);
+  border-color: transparent;
+}
+.btn--ghost:hover:not(:disabled) {
+  background: var(--color-bg-elevated);
+  color: var(--color-text-primary);
+}
+
+.btn--danger {
+  background: var(--color-danger-muted);
+  color: var(--color-danger);
+  border-color: transparent;
+}
+.btn--danger:hover:not(:disabled) {
+  background: var(--color-danger);
+  color: #fff;
+}
+
+/* Loading spinner */
+.btn--loading { pointer-events: none; }
+.btn__spinner {
+  width: 14px; height: 14px;
+  border: 2px solid rgba(255,255,255,0.3);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+.btn__icon { flex-shrink: 0; }
+.btn__icon--right { margin-left: 2px; }
