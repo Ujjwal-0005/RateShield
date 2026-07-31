@@ -1,0 +1,9 @@
+.apikeys-management-page {
+  width: 100%;
+}
+
+.key-cell {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+}
