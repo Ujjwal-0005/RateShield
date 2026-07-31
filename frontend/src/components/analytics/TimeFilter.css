@@ -1,0 +1,39 @@
+.time-filter {
+  display: flex;
+  align-items: center;
+  background: var(--color-bg-elevated);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 3px;
+  gap: 2px;
+}
+
+.time-filter__icon-wrap {
+  display: flex;
+  align-items: center;
+  padding: 0 var(--sp-2);
+}
+
+.time-filter__btn {
+  background: transparent;
+  border: none;
+  padding: 4px 10px;
+  border-radius: var(--radius-md);
+  font-family: var(--font-sans);
+  font-size: var(--text-xs);
+  font-weight: var(--font-medium);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: color var(--transition-fast), background var(--transition-fast);
+}
+
+.time-filter__btn:hover {
+  color: var(--color-text-primary);
+}
+
+.time-filter__btn--active {
+  background: var(--color-bg-surface);
+  color: var(--color-brand);
+  font-weight: var(--font-semibold);
+  box-shadow: var(--shadow-sm);
+}

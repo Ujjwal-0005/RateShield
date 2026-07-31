@@ -1,0 +1,36 @@
+.analytics-page {
+  width: 100%;
+}
+
+.analytics-metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: var(--sp-4);
+}
+
+.analytics-grid-two {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--sp-6);
+}
+
+@media (max-width: 1200px) {
+  .analytics-metrics-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .analytics-grid-two {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .analytics-metrics-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .analytics-metrics-grid {
+    grid-template-columns: 1fr;
+  }
+}
