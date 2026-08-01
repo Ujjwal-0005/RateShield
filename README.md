@@ -1,13 +1,66 @@
 # RateShield
 
-RateShield is a production-grade, distributed rate-limiting backend with MongoDB, Redis, JWT-based dashboard authentication, role-based authorization, policy management, API key management, and a dynamic rate limiter engine.
+RateShield is a production-grade API Management Platform with a distributed dynamic rate-limiting engine, JWT-based admin authentication, role-based access control, and a full React admin dashboard.
 
 ## Current Repository Layout
 
-- `backend/` contains the Express API, services, models, validators, and Redis integration.
-- `frontend/` is still the default Vite React starter and is not yet connected to the backend UI.
-- `docs/` contains architecture, testing, debugging, and roadmap documentation.
-- `docker-compose.yml` starts Redis and MongoDB services.
+- `backend/` — Express API with MongoDB, Redis, JWT auth, policy/API-key management, and dynamic rate limiter.
+- `frontend/` — React 19 + Vite admin dashboard (SPA) with full auth flow, protected routes, and live data tables.
+- `docs/` — Architecture, API specs, testing guides, and interview preparation notes.
+- `docker-compose.yml` — Starts Redis and MongoDB services locally.
+
+---
+
+## Admin Dashboard (Frontend)
+
+A production-quality SPA built with React 19 and Vite 8, consuming all backend APIs.
+
+### Features
+- 🔐 **JWT Authentication** — Login, logout, auto token refresh, session persistence
+- 🛡️ **Protected Routes** — `ProtectedRoute` / `PublicRoute` guards with post-login redirect
+- 📊 **Dashboard Overview** — SaaS-style landing overview with Welcome Header, System Health status bar (Redis, MongoDB, Express API, Gateway), statistics cards grid, live traffic SVG chart telemetry, quick action modals (Create Key, Create Policy, API Playground), and recent activity feeds
+- 📋 **Policy Management Dashboard** — Full CRUD management for rate limiting policies (search, status filters, sorting, creation, editing, details drawer, status toggles, deletion confirmation modal, pagination, toast notifications)
+- 🔑 **API Key Management Dashboard** — Production-ready client key management (search, multi-filters for Status, Environment & Policy, creation modal, one-time secret key dialog with copy support, regeneration flow, status toggling, deletion confirmation, pagination)
+- 📈 **Analytics & Monitoring Dashboard** — Real-time telemetry with synchronized time-range filters (1h/24h/7d/30d), SVG vector charts (request trends & allowed vs blocked), overview KPI cards, system health monitoring (Redis/MongoDB/Express/Gateway), rate limit event audit table, and administrative activity feed
+- ⚙️ **Settings** — Admin profile display
+- 🎨 **Design System** — Dark theme, CSS custom properties, Inter / JetBrains Mono fonts
+- ⚡ **Axios Layer** — Centralized client with request/response interceptors and silent token refresh
+
+### Running the Dashboard
+
+```bash
+cd frontend
+npm install
+npm run dev        # http://localhost:3000
+```
+
+> The Vite dev server proxies `/auth`, `/policies`, `/api-keys`, and `/metrics` to `http://localhost:5000`.
+
+### Documentation
+
+Detailed documentation is available in `docs/`:
+- `docs/DashboardOverview.md`
+- `docs/DashboardComponents.md`
+- `docs/DashboardArchitecture.md`
+- `docs/DashboardTesting.md`
+- `docs/DashboardInterview.md`
+- `docs/PolicyDashboard.md`
+- `docs/PolicyDashboardArchitecture.md`
+- `docs/PolicyDashboardTesting.md`
+- `docs/PolicyDashboardInterview.md`
+- `docs/ApiKeyDashboard.md`
+- `docs/ApiKeyDashboardArchitecture.md`
+- `docs/ApiKeyDashboardTesting.md`
+- `docs/ApiKeyDashboardInterview.md`
+- `docs/AnalyticsDashboard.md`
+- `docs/AnalyticsArchitecture.md`
+- `docs/AnalyticsTesting.md`
+- `docs/AnalyticsInterview.md`
+- `docs/Observability.md`
+
+### Screenshots
+
+> _Analytics & Monitoring Dashboard preview available at http://localhost:3000/analytics._
 
 ---
 
